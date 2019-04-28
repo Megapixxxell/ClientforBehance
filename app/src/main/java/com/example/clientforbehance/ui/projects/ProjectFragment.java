@@ -9,6 +9,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,11 +28,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import android.support.v7.widget.SearchView;
+import android.widget.Toast;
+
 public class ProjectFragment extends Fragment implements Refreshable, ProjectsAdapter.OnItemClickListener {
 
     public static final String USERNAME_KEY = "username";
     public static final String ARGS_KEY = "user args";
     public static final String PROJECT_ID = "project_id";
+
+    private String mQuerry = "";
 
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
@@ -58,6 +66,12 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
         if (context instanceof RefreshOwner) {
             mRefreshOwner = (RefreshOwner) context;
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -97,12 +111,42 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
     }
 
     @Override
-    public void onRefreshData() {
-        getProjects();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+
+        MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        SearchView searchView;
+
+        searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+
+                mQuerry = s;
+                getProjects(mQuerry);
+                if( ! searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                myActionMenuItem.collapseActionView();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void getProjects() {
-        mDisposable = ApiUtils.getApiService().getProjects(BuildConfig.API_QUERY)
+    @Override
+    public void onRefreshData() {
+        getProjects(mQuerry);
+    }
+
+    private void getProjects(String querry) {
+        mDisposable = ApiUtils.getApiService().getProjects(querry)
                 .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getProjectResponseFromStorage() : null)
