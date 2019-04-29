@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.R;
-import com.example.clientforbehance.common.BasePresenter;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
@@ -23,17 +25,10 @@ import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.project.Project;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
-import com.example.clientforbehance.utils.ApiUtils;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-
-import android.support.v7.widget.SearchView;
 
 import java.util.List;
 
-public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
+public class ProjectFragment extends PresenterFragment
         implements ProjectsView, Refreshable, ProjectsAdapter.OnItemClickListener {
 
     public static final String USERNAME_KEY = "username";
@@ -47,8 +42,18 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     private View mErrorView;
     private Storage mStorage;
     private ProjectsAdapter mProjectsAdapter;
-    private ProjectsPresenter mProjectsPresenter;
+    @InjectPresenter
+    ProjectsPresenter mProjectsPresenter;
 
+    @ProvidePresenter
+    ProjectsPresenter providePresenter () {
+        return new ProjectsPresenter(this, mStorage);
+    }
+
+    @Override
+    protected ProjectsPresenter getPresenter() {
+        return mProjectsPresenter;
+    }
 
     public static ProjectFragment newInstance() {
 
@@ -97,8 +102,6 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
             getActivity().setTitle(R.string.projects);
         }
 
-        mProjectsPresenter = new ProjectsPresenter(this, mStorage);
-
         mProjectsAdapter = new ProjectsAdapter(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mProjectsAdapter);
@@ -146,11 +149,6 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     @Override
     public void onRefreshData() {
         mProjectsPresenter.getProjects(mQuery);
-    }
-
-    @Override
-    protected ProjectsPresenter getPresenter() {
-        return mProjectsPresenter;
     }
 
     @Override

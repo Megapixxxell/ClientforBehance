@@ -21,7 +21,7 @@ import com.example.clientforbehance.utils.DateUtils;
 import com.squareup.picasso.Picasso;
 
 
-public class UserFragment extends PresenterFragment<UserPresenter> implements Refreshable, UserView {
+public class UserFragment extends PresenterFragment implements Refreshable, UserView {
 
     private ImageView mUserImage;
     private TextView mUsername, mUserCreatedOn, mUserLocation, mName;

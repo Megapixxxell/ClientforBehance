@@ -1,7 +1,6 @@
 package com.example.clientforbehance.ui.projects;
 
-import android.view.View;
-
+import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.utils.ApiUtils;
@@ -9,7 +8,8 @@ import com.example.clientforbehance.utils.ApiUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProjectsPresenter extends BasePresenter {
+@InjectViewState
+public class ProjectsPresenter extends BasePresenter<ProjectsView> {
 
     private ProjectsView mView;
     private Storage mStorage;

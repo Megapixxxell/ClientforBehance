@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
@@ -20,14 +22,21 @@ import com.example.clientforbehance.ui.projects.ProjectFragment;
 
 import java.util.List;
 
-public class CommentsFragment extends PresenterFragment<CommentsPresenter> implements Refreshable, CommentsView {
+public class CommentsFragment extends PresenterFragment implements Refreshable, CommentsView {
 
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private Storage mStorage;
     private CommentsAdapter mCommentsAdapter;
-    private CommentsPresenter mCommentsPresenter;
+    @InjectPresenter
+    CommentsPresenter mCommentsPresenter;
+
+    @ProvidePresenter
+    CommentsPresenter provideCommentsPresenter() {
+        return new CommentsPresenter(mStorage, this);
+
+    }
 
     private int mProjectId;
 
@@ -72,7 +81,6 @@ public class CommentsFragment extends PresenterFragment<CommentsPresenter> imple
             getActivity().setTitle(R.string.comments);
         }
 
-        mCommentsPresenter = new CommentsPresenter(mStorage, this);
         mCommentsAdapter = new CommentsAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mCommentsAdapter);
