@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
@@ -31,8 +33,14 @@ public class UserFragment extends PresenterFragment implements Refreshable, User
     private String mUsernameStr;
 
     private RefreshOwner mRefreshOwner;
-    private UserPresenter mUserPresenter;
     private Storage mStorage;
+    @InjectPresenter
+    UserPresenter mUserPresenter;
+
+    @ProvidePresenter
+    UserPresenter provideUserPresenter() {
+        return new UserPresenter(mStorage);
+    }
 
     public static UserFragment newInstance(Bundle args) {
 
@@ -76,7 +84,6 @@ public class UserFragment extends PresenterFragment implements Refreshable, User
         if (getActivity() != null) {
             getActivity().setTitle(mUsernameStr);
         }
-        mUserPresenter = new UserPresenter(mStorage, this);
         onRefreshData();
     }
 

@@ -34,8 +34,7 @@ public class CommentsFragment extends PresenterFragment implements Refreshable, 
 
     @ProvidePresenter
     CommentsPresenter provideCommentsPresenter() {
-        return new CommentsPresenter(mStorage, this);
-
+        return new CommentsPresenter(mStorage);
     }
 
     private int mProjectId;

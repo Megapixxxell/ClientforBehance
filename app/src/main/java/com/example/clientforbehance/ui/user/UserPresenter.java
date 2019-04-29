@@ -1,7 +1,7 @@
 package com.example.clientforbehance.ui.user;
 
-import android.view.View;
 
+import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.utils.ApiUtils;
@@ -9,14 +9,13 @@ import com.example.clientforbehance.utils.ApiUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class UserPresenter extends BasePresenter {
+@InjectViewState
+public class UserPresenter extends BasePresenter<UserView> {
 
     private Storage mStorage;
-    private UserView mUserView;
 
-    public UserPresenter(Storage storage, UserView userView) {
+    public UserPresenter(Storage storage) {
         mStorage = storage;
-        mUserView = userView;
     }
 
     public void getUser(String username) {
@@ -26,9 +25,9 @@ public class UserPresenter extends BasePresenter {
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getUser(username) : null)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mUserView.showRefresh())
-                .doFinally(() -> mUserView.hideRefresh())
-                .subscribe(userResponse -> mUserView.showUser(userResponse.getUser()),
-                        throwable -> mUserView.showError()));
+                .doOnSubscribe(disposable -> getViewState().showRefresh())
+                .doFinally(() -> getViewState().hideRefresh())
+                .subscribe(userResponse -> getViewState().showUser(userResponse.getUser()),
+                        throwable -> getViewState().showError()));
     }
 }

@@ -12,11 +12,9 @@ import io.reactivex.schedulers.Schedulers;
 public class CommentsPresenter extends BasePresenter<CommentsView> {
 
     private Storage mStorage;
-    private CommentsView mCommentsView;
 
-    public CommentsPresenter(Storage storage, CommentsView commentsView) {
+    public CommentsPresenter(Storage storage) {
         mStorage = storage;
-        mCommentsView = commentsView;
     }
 
     void getComments (int projectId) {
@@ -26,9 +24,9 @@ public class CommentsPresenter extends BasePresenter<CommentsView> {
                         mStorage.getCommentResponseFromStorage() : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mCommentsView.showRefresh())
-                .doFinally(() -> mCommentsView.hideRefresh())
-                .subscribe(response -> mCommentsView.showComments(response.getComments()),
-                        throwable -> mCommentsView.showError()));
+                .doOnSubscribe(disposable -> getViewState().showRefresh())
+                .doFinally(() -> getViewState().hideRefresh())
+                .subscribe(response -> getViewState().showComments(response.getComments()),
+                        throwable -> getViewState().showError()));
     }
 }

@@ -11,11 +11,9 @@ import io.reactivex.schedulers.Schedulers;
 @InjectViewState
 public class ProjectsPresenter extends BasePresenter<ProjectsView> {
 
-    private ProjectsView mView;
     private Storage mStorage;
 
-    public ProjectsPresenter(ProjectsView view, Storage storage) {
-        mView = view;
+    public ProjectsPresenter(Storage storage) {
         mStorage = storage;
     }
 
@@ -27,16 +25,16 @@ public class ProjectsPresenter extends BasePresenter<ProjectsView> {
                         mStorage.getProjectResponseFromStorage() : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mView.showRefresh())
-                .doFinally(() -> mView.hideRefresh())
-                .subscribe(response -> mView.showProjects(response.getProjects()),
-                        throwable -> mView.showError()));
+                .doOnSubscribe(disposable -> getViewState().showRefresh())
+                .doFinally(() -> getViewState().hideRefresh())
+                .subscribe(response -> getViewState().showProjects(response.getProjects()),
+                        throwable -> getViewState().showError()));
     }
 
     public void openUserFragment(String username) {
-        mView.openUserFragment(username);
+        getViewState().openUserFragment(username);
     }
     public void openCommentsFragment(int projectId){
-        mView.openCommentsFragment(projectId);
+        getViewState().openCommentsFragment(projectId);
     }
 }
