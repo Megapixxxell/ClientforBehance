@@ -11,4 +11,4 @@ Retrofit2
 RxJava2
 REST API
 Room Database
-
+MVP
