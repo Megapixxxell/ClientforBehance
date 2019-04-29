@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,26 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.clientforbehance.R;
+import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
-import com.example.clientforbehance.ui.projects.ProjectsAdapter;
-import com.example.clientforbehance.utils.ApiUtils;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import java.util.List;
 
-public class CommentsFragment extends Fragment implements Refreshable {
+public class CommentsFragment extends PresenterFragment<CommentsPresenter> implements Refreshable, CommentsView {
 
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private Storage mStorage;
     private CommentsAdapter mCommentsAdapter;
-    private Disposable mDisposable;
+    private CommentsPresenter mCommentsPresenter;
 
     private int mProjectId;
 
@@ -76,46 +72,50 @@ public class CommentsFragment extends Fragment implements Refreshable {
             getActivity().setTitle(R.string.comments);
         }
 
+        mCommentsPresenter = new CommentsPresenter(mStorage, this);
         mCommentsAdapter = new CommentsAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mCommentsAdapter);
-
         onRefreshData();
-
     }
-
 
     @Override
     public void onDetach() {
         mStorage = null;
         mRefreshOwner = null;
-        if (mDisposable != null) mDisposable.dispose();
         super.onDetach();
     }
 
     @Override
     public void onRefreshData() {
-        getComments();
+        mCommentsPresenter.getComments(mProjectId);
     }
 
-    private void getComments() {
-        mDisposable = ApiUtils.getApiService().getProjectComments(mProjectId)
-                .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse))
-                .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getCommentResponseFromStorage() : null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
-                .doFinally(() -> mRefreshOwner.setRefreshState(false))
-                .subscribe(response -> {
-                            mErrorView.setVisibility(View.GONE);
-                            mRecyclerView.setVisibility(View.VISIBLE);
-                            mCommentsAdapter.addData(response.getComments(), true);
-                        },
-                        throwable -> {
-                            mErrorView.setVisibility(View.VISIBLE);
-                            mRecyclerView.setVisibility(View.GONE);
-                        });
+    @Override
+    public void showRefresh() {
+        mRefreshOwner.setRefreshState(true);
     }
 
+    @Override
+    public void hideRefresh() {
+        mRefreshOwner.setRefreshState(false);
+    }
+
+    @Override
+    public void showError() {
+        mErrorView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected CommentsPresenter getPresenter() {
+        return mCommentsPresenter;
+    }
+
+    @Override
+    public void showComments(List<Comment> comments) {
+        mErrorView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mCommentsAdapter.addData(comments, true);
+    }
 }

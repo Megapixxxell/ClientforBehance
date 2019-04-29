@@ -29,12 +29,8 @@ public class ProjectsPresenter extends BasePresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mView.showRefresh())
                 .doFinally(() -> mView.hideRefresh())
-                .subscribe(response -> {
-                            mView.showProjects(response.getProjects());
-                        },
-                        throwable -> {
-                            mView.showError();
-                        }));
+                .subscribe(response -> mView.showProjects(response.getProjects()),
+                        throwable -> mView.showError()));
     }
 
     public void openUserFragment(String username) {
