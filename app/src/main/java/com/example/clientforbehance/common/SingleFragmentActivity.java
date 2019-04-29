@@ -35,11 +35,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     }
 
     public void changeFragment(Fragment fragment) {
-        boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer) != null;
+        boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragment_container) != null;
 
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragmentContainer, fragment);
+                .replace(R.id.fragment_container, fragment);
 
         if (addToBackStack) {
             transaction.addToBackStack(fragment.getClass().getSimpleName());
@@ -50,7 +50,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
     @Override
     public void onRefresh() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof Refreshable) {
             ((Refreshable) fragment).onRefreshData();
         } else {
