@@ -24,6 +24,7 @@ import java.util.List;
 
 public class CommentsFragment extends PresenterFragment implements Refreshable, CommentsView {
 
+    private int mProjectId;
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
@@ -36,8 +37,6 @@ public class CommentsFragment extends PresenterFragment implements Refreshable, 
     CommentsPresenter provideCommentsPresenter() {
         return new CommentsPresenter(mStorage);
     }
-
-    private int mProjectId;
 
     public static CommentsFragment newInstance(Bundle args) {
         CommentsFragment fragment = new CommentsFragment();
