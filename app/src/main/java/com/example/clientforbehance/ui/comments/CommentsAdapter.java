@@ -3,11 +3,10 @@ package com.example.clientforbehance.ui.comments;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.clientforbehance.R;
 import com.example.clientforbehance.data.model.comment.Comment;
+import com.example.clientforbehance.databinding.CommentBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +19,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
     @Override
     public CommentsHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-        View v = inflater.inflate(R.layout.li_comment, viewGroup, false);
-        return new CommentsHolder(v);
+        CommentBinding binding = CommentBinding.inflate(inflater, viewGroup, false);
+        return new CommentsHolder(binding);
     }
 
     @Override

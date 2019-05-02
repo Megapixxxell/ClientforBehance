@@ -10,29 +10,26 @@ import com.example.clientforbehance.R;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.AppDelegate;
 
-public abstract class SingleFragmentActivity extends AppCompatActivity implements RefreshOwner,
-        SwipeRefreshLayout.OnRefreshListener, Storage.StorageOwner {
+public abstract class SingleFragmentActivity extends AppCompatActivity {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ac_swipe_container);
-        mSwipeRefreshLayout = findViewById(R.id.refresher);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        setContentView(getLayout());
+
 
         if (savedInstanceState == null) {
             changeFragment(getFragment());
         }
     }
 
+    protected int getLayout() {
+        return R.layout.ac_container;
+    }
+
     protected abstract Fragment getFragment();
 
-    @Override
-    public Storage obtainStorage() {
-        return ((AppDelegate) getApplicationContext()).getStorage();
-    }
 
     public void changeFragment(Fragment fragment) {
         boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer) != null;
@@ -48,18 +45,5 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         transaction.commit();
     }
 
-    @Override
-    public void onRefresh() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-        if (fragment instanceof Refreshable) {
-            ((Refreshable) fragment).onRefreshData();
-        } else {
-            setRefreshState(false);
-        }
-    }
 
-    @Override
-    public void setRefreshState(boolean refreshing) {
-        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(refreshing));
-    }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,23 +16,21 @@ import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
 import com.example.clientforbehance.data.model.Storage;
-import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
-import com.example.clientforbehance.ui.projects.ProjectsAdapter;
 import com.example.clientforbehance.utils.ApiUtils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class CommentsFragment extends Fragment implements Refreshable {
+public class CommentsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerView;
-    private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private Storage mStorage;
     private CommentsAdapter mCommentsAdapter;
     private Disposable mDisposable;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     private int mProjectId;
 
@@ -47,10 +46,6 @@ public class CommentsFragment extends Fragment implements Refreshable {
         if (context instanceof Storage.StorageOwner) {
             mStorage = ((Storage.StorageOwner) context).obtainStorage();
         }
-
-        if (context instanceof RefreshOwner) {
-            mRefreshOwner = (RefreshOwner) context;
-        }
     }
 
     @Nullable
@@ -64,6 +59,7 @@ public class CommentsFragment extends Fragment implements Refreshable {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.recycler_comments);
         mErrorView = view.findViewById(R.id.errorView);
+        mSwipeRefreshLayout = view.findViewById(R.id.refresher);
     }
 
     @Override
@@ -80,7 +76,9 @@ public class CommentsFragment extends Fragment implements Refreshable {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mCommentsAdapter);
 
-        onRefreshData();
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        onRefresh();
 
     }
 
@@ -88,14 +86,8 @@ public class CommentsFragment extends Fragment implements Refreshable {
     @Override
     public void onDetach() {
         mStorage = null;
-        mRefreshOwner = null;
         if (mDisposable != null) mDisposable.dispose();
         super.onDetach();
-    }
-
-    @Override
-    public void onRefreshData() {
-        getComments();
     }
 
     private void getComments() {
@@ -105,8 +97,8 @@ public class CommentsFragment extends Fragment implements Refreshable {
                         mStorage.getCommentResponseFromStorage() : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
-                .doFinally(() -> mRefreshOwner.setRefreshState(false))
+                .doOnSubscribe(disposable -> mSwipeRefreshLayout.setRefreshing(true))
+                .doFinally(() -> mSwipeRefreshLayout.setRefreshing(false))
                 .subscribe(response -> {
                             mErrorView.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
@@ -118,4 +110,8 @@ public class CommentsFragment extends Fragment implements Refreshable {
                         });
     }
 
+    @Override
+    public void onRefresh() {
+        getComments();
+    }
 }

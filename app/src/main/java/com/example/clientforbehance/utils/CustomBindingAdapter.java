@@ -7,14 +7,10 @@ import com.squareup.picasso.Picasso;
 
 public class CustomBindingAdapter {
 
-    @BindingAdapter("bind:coverImageUrl")
+    @BindingAdapter("bind:imageUrl")
     public static void loadCoverImage(ImageView imageView, String urlImage) {
         Picasso.with(imageView.getContext()).load(urlImage).fit().into(imageView);
     }
 
-    @BindingAdapter("bind:userImageUrl")
-    public static void loadUserImage(ImageView imageView, String urlImage) {
-        Picasso.with(imageView.getContext()).load(urlImage).fit().into(imageView);
-    }
 
 }

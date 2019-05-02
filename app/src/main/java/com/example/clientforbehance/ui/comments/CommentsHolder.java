@@ -1,39 +1,21 @@
 package com.example.clientforbehance.ui.comments;
 
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.example.clientforbehance.R;
 import com.example.clientforbehance.data.model.comment.Comment;
-import com.squareup.picasso.Picasso;
+import com.example.clientforbehance.databinding.CommentBinding;
 
 public class CommentsHolder extends RecyclerView.ViewHolder {
 
-    private ImageView mImage;
-    private TextView mCommentText, mUsername;
+    CommentBinding mCommentBinding;
 
-    public CommentsHolder(@NonNull View itemView) {
-        super(itemView);
-        mImage = itemView.findViewById(R.id.iv_comment);
-        mCommentText = itemView.findViewById(R.id.text_comment);
-        mUsername = itemView.findViewById(R.id.tv_comment_username);
+    public CommentsHolder(CommentBinding binding) {
+        super(binding.getRoot());
+        mCommentBinding = binding;
     }
 
     void bind(Comment comment) {
-        if (comment.getUser().getImage() != null && comment.getUser() != null) {
-            Picasso.with(itemView.getContext())
-                    .load(comment.getUser().getImage().getPhotoUrl())
-                    .fit()
-                    .into(mImage);
-        }
-
-
-        mUsername.setText(comment.getUser().getUsername());
-        mCommentText.setText(comment.getComment());
+        mCommentBinding.setComment(new CommentListItemViewModel(comment));
+        mCommentBinding.executePendingBindings();
     }
-
-
 }

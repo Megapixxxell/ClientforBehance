@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,7 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import android.support.v7.widget.SearchView;
 import android.widget.Toast;
 
-public class ProjectFragment extends Fragment implements Refreshable, ProjectsAdapter.OnItemClickListener {
+public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, ProjectsAdapter.OnItemClickListener {
 
     public static final String USERNAME_KEY = "username";
     public static final String ARGS_KEY = "user args";
@@ -40,11 +41,11 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
     private String mQuerry = "";
 
     private RecyclerView mRecyclerView;
-    private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private Storage mStorage;
     private ProjectsAdapter mProjectsAdapter;
     private Disposable mDisposable;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
     public static ProjectFragment newInstance() {
@@ -61,10 +62,6 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
         super.onAttach(context);
         if (context instanceof Storage.StorageOwner) {
             mStorage = ((Storage.StorageOwner) context).obtainStorage();
-        }
-
-        if (context instanceof RefreshOwner) {
-            mRefreshOwner = (RefreshOwner) context;
         }
     }
 
@@ -85,6 +82,7 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.recycler_projects);
         mErrorView = view.findViewById(R.id.errorView);
+        mSwipeRefreshLayout = view.findViewById(R.id.refresher);
     }
 
     @Override
@@ -94,18 +92,19 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
             getActivity().setTitle(R.string.projects);
         }
 
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         mProjectsAdapter = new ProjectsAdapter(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mProjectsAdapter);
 
-        onRefreshData();
+        onRefresh();
 
     }
 
     @Override
     public void onDetach() {
         mStorage = null;
-        mRefreshOwner = null;
         if (mDisposable != null) mDisposable.dispose();
         super.onDetach();
     }
@@ -140,11 +139,6 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public void onRefreshData() {
-        getProjects(mQuerry);
-    }
-
     private void getProjects(String querry) {
         mDisposable = ApiUtils.getApiService().getProjects(querry)
                 .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
@@ -152,8 +146,8 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
                         mStorage.getProjectResponseFromStorage() : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
-                .doFinally(() -> mRefreshOwner.setRefreshState(false))
+                .doOnSubscribe(disposable -> mSwipeRefreshLayout.setRefreshing(true))
+                .doFinally(() -> mSwipeRefreshLayout.setRefreshing(false))
                 .subscribe(response -> {
                             mErrorView.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
@@ -182,5 +176,10 @@ public class ProjectFragment extends Fragment implements Refreshable, ProjectsAd
         args.putInt(PROJECT_ID, projectId);
         commentsIntent.putExtra(ARGS_KEY, args);
         startActivity(commentsIntent);
+    }
+
+    @Override
+    public void onRefresh() {
+        getProjects(mQuerry);
     }
 }

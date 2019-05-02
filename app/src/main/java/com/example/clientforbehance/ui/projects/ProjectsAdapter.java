@@ -3,10 +3,8 @@ package com.example.clientforbehance.ui.projects;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.clientforbehance.R;
 import com.example.clientforbehance.data.model.project.Project;
 import com.example.clientforbehance.databinding.ProjectBinding;
 
@@ -26,7 +24,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public ProjectsHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-        View view = inflater.inflate(R.layout.li_projects, viewGroup, false);
         ProjectBinding binding = ProjectBinding.inflate(inflater, viewGroup, false);
 
         return new ProjectsHolder(binding);
