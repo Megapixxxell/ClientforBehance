@@ -3,11 +3,11 @@ package com.example.clientforbehance.ui.user;
 import android.support.v4.app.Fragment;
 
 import com.example.clientforbehance.AppDelegate;
-import com.example.clientforbehance.common.RefreshActivity;
+import com.example.clientforbehance.common.SingleFragmentActivity;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 
-public class UserActivity extends RefreshActivity implements Storage.StorageOwner {
+public class UserActivity extends SingleFragmentActivity implements Storage.StorageOwner {
 
     @Override
     protected Fragment getFragment() {

@@ -4,9 +4,9 @@ import com.example.clientforbehance.data.model.comment.Comment;
 
 public class CommentListItemViewModel {
 
-    public String mImageUrl;
-    public String mCommentText;
-    public String mUsername;
+    private String mImageUrl;
+    private String mCommentText;
+    private String mUsername;
 
     public CommentListItemViewModel (Comment comment) {
         mImageUrl = comment.getUser().getImage().getPhotoUrl();

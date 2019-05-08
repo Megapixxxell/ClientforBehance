@@ -7,7 +7,7 @@ import com.example.clientforbehance.databinding.CommentBinding;
 
 public class CommentsHolder extends RecyclerView.ViewHolder {
 
-    CommentBinding mCommentBinding;
+    private CommentBinding mCommentBinding;
 
     public CommentsHolder(CommentBinding binding) {
         super(binding.getRoot());

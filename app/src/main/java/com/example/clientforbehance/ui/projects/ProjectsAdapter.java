@@ -8,16 +8,16 @@ import android.view.ViewGroup;
 import com.example.clientforbehance.data.model.project.Project;
 import com.example.clientforbehance.databinding.ProjectBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
-    private final List<Project> mProjects = new ArrayList<>();
+    private final List<Project> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
-    ProjectsAdapter(OnItemClickListener onItemClickListener) {
+    public ProjectsAdapter(List<Project> projects, OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
+        mProjects = projects;
     }
 
     @NonNull
@@ -38,14 +38,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public int getItemCount() {
         return mProjects.size();
-    }
-
-    void addData(List<Project> projects, boolean isRefreshed) {
-        if (isRefreshed) {
-            mProjects.clear();
-        }
-        mProjects.addAll(projects);
-        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {

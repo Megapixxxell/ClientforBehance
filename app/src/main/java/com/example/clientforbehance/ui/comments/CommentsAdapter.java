@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.databinding.CommentBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
 
-    private List<Comment> mComments = new ArrayList<>();
+    private List<Comment> mComments;
+
+    public CommentsAdapter (List<Comment> comments) {
+        mComments = comments;
+    }
 
     @NonNull
     @Override
@@ -31,15 +34,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
 
     @Override
     public int getItemCount() {
-        return mComments.size();
-    }
-
-    void addData (List<Comment> comments, boolean isRefreshed) {
-        if (isRefreshed) {
-            mComments.clear();
-        }
-
-        mComments.addAll(comments);
-        notifyDataSetChanged();
+        return mComments == null ? 0 : mComments.size();
     }
 }

@@ -1,25 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/refresher"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <data class="CommentsBindingg">
+
+        <import
+            alias="V"
+            type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.example.clientforbehance.ui.comments.CommentsViewModel" />
+
+
+    </data>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresher"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        bind:onRefresh="@{viewModel.onRefreshListener}"
+        bind:refreshState="@{viewModel.isLoading}">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_comments"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <include
-            layout="@layout/v_error"
-            android:visibility="gone" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.isErrorVisible ? V.GONE : V.VISIBLE}"
+                bind:data="@{viewModel.comments}" />
 
-    </LinearLayout>
+            <include
+                layout="@layout/v_error"
+                android:visibility="@{viewModel.isErrorVisible ? V.VISIBLE : V.GONE}" />
 
-</android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</layout>
 
