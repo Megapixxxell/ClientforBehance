@@ -1,5 +1,6 @@
 package com.example.clientforbehance.ui.projects;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.databinding.ProjectsBinding;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
+import com.example.clientforbehance.utils.CustomProjectsViewModelFactory;
 
 public class ProjectFragment extends Fragment {
 
@@ -26,14 +28,16 @@ public class ProjectFragment extends Fragment {
     public static final String ARGS_KEY = "user args";
     public static final String PROJECT_ID = "project_id";
 
-    protected String mQuerry = "Android";
 
+    private Storage mStorage;
     private ProjectsViewModel mProjectsViewModel;
+    private ProjectsBinding mBinding;
+
 
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener = new ProjectsAdapter.OnItemClickListener() {
         @Override
-        public void onAuthorClick(String username) {
-            Intent userIntent = new Intent(getActivity(), UserActivity.class);
+        public void onAuthorClick(Context context, String username) {
+            Intent userIntent = new Intent(context, UserActivity.class);
             Bundle args = new Bundle();
             args.putString(USERNAME_KEY, username);
             userIntent.putExtra(ARGS_KEY, args);
@@ -50,15 +54,13 @@ public class ProjectFragment extends Fragment {
         }
     };
 
-
     public static ProjectFragment newInstance() { return new ProjectFragment(); }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Storage.StorageOwner) {
-            Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            mProjectsViewModel = new ProjectsViewModel(storage, mOnItemClickListener);
+            mStorage = ((Storage.StorageOwner) context).obtainStorage();
         }
     }
 
@@ -71,9 +73,8 @@ public class ProjectFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
-        binding.setVm(mProjectsViewModel);
-        return binding.getRoot();
+        mBinding = ProjectsBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
@@ -82,13 +83,11 @@ public class ProjectFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(R.string.projects);
         }
-        mProjectsViewModel.loadProjects(mQuerry);
-    }
 
-    @Override
-    public void onDetach() {
-        mProjectsViewModel.dispatchDetach();
-        super.onDetach();
+        CustomProjectsViewModelFactory factory = new CustomProjectsViewModelFactory(mStorage, mOnItemClickListener);
+        mProjectsViewModel = ViewModelProviders.of(this, factory).get(ProjectsViewModel.class);
+        mBinding.setVm(mProjectsViewModel);
+        mBinding.setLifecycleOwner(this);
     }
 
     @Override
@@ -103,8 +102,8 @@ public class ProjectFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String s) {
 
-                mQuerry = s;
-                mProjectsViewModel.loadProjects(mQuerry);
+                mProjectsViewModel.updateProjects(s);
+
                 if (!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }

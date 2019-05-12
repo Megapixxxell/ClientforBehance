@@ -1,18 +1,19 @@
 package com.example.clientforbehance.utils;
 
+import android.arch.paging.PagedList;
 import android.databinding.BindingAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.example.clientforbehance.data.model.comment.Comment;
-import com.example.clientforbehance.data.model.project.Project;
+import com.example.clientforbehance.data.model.project.RichProject;
 import com.example.clientforbehance.ui.comments.CommentsAdapter;
+import com.example.clientforbehance.ui.projects.ProjectListItemViewModel;
 import com.example.clientforbehance.ui.projects.ProjectsAdapter;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 public class CustomBindingAdapter {
 
@@ -22,16 +23,18 @@ public class CustomBindingAdapter {
     }
 
     @BindingAdapter({"bind:data", "bind:clickHandler"})
-    public static void configureRecyclerView (RecyclerView recyclerView, List<Project> projects,
+    public static void configureRecyclerView (RecyclerView recyclerView, PagedList<RichProject> projects,
                                               ProjectsAdapter.OnItemClickListener listener) {
-        ProjectsAdapter adapter = new ProjectsAdapter(projects, listener);
+        ProjectsAdapter adapter = new ProjectsAdapter(listener);
+        adapter.submitList(projects);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
     }
 
     @BindingAdapter({"bind:data"})
-    public static void configureCommentsRecyclerView (RecyclerView recyclerView, List<Comment> comments) {
-        CommentsAdapter adapter = new CommentsAdapter(comments);
+    public static void configureCommentsRecyclerView (RecyclerView recyclerView, PagedList<Comment> comments) {
+        CommentsAdapter adapter = new CommentsAdapter();
+        adapter.submitList(comments);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
     }
@@ -41,6 +44,11 @@ public class CustomBindingAdapter {
                                                     SwipeRefreshLayout.OnRefreshListener listener) {
         layout.setOnRefreshListener(listener);
         layout.post(() -> layout.setRefreshing(isLoading));
+    }
+
+    @BindingAdapter({"bind:username", "bind:clickListener"})
+    public static void configureOnClick(ImageView imageView, String username, ProjectsAdapter.OnItemClickListener listener) {
+        imageView.setOnClickListener(view -> listener.onAuthorClick(view.getContext(), username));
     }
 
 }

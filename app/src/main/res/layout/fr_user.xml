@@ -5,6 +5,8 @@
 
     <data class="UserBinding">
 
+        <import type="com.example.clientforbehance.utils.DateUtils" />
+
         <import
             alias="V"
             type="android.view.View" />
@@ -39,7 +41,7 @@
                     android:layout_width="128dp"
                     android:layout_height="128dp"
                     android:contentDescription="@string/content_description_details"
-                    bind:imageUrl="@{vm.userImageUrl}" />
+                    bind:imageUrl="@{vm.user.getImage.getPhotoUrl}" />
 
                 <TextView
                     android:id="@+id/tv_display_name_details"
@@ -48,7 +50,7 @@
                     android:layout_alignTop="@id/iv_user"
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@id/iv_user"
-                    android:text="@{vm.name}"
+                    android:text="@{vm.user.getDisplayName}"
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold" />
 
@@ -58,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_display_name_details"
                     android:layout_alignStart="@id/tv_display_name_details"
-                    android:text="@{vm.username}" />
+                    android:text="@{vm.user.getUsername}" />
 
                 <TextView
                     android:id="@+id/tv_created_on_details"
@@ -66,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_username_details"
                     android:layout_alignStart="@id/tv_username_details"
-                    android:text="@{vm.userCreatedOn}" />
+                    android:text="@{DateUtils.format(vm.user.getCreatedOn)}" />
 
                 <TextView
                     android:id="@+id/tv_location_details"
@@ -74,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_created_on_details"
                     android:layout_alignStart="@id/tv_created_on_details"
-                    android:text="@{vm.userLocation}" />
+                    android:text="@{vm.user.getLocation}" />
 
             </RelativeLayout>
 

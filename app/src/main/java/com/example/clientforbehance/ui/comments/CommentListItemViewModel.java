@@ -8,10 +8,12 @@ public class CommentListItemViewModel {
     private String mCommentText;
     private String mUsername;
 
-    public CommentListItemViewModel (Comment comment) {
-        mImageUrl = comment.getUser().getImage().getPhotoUrl();
+    CommentListItemViewModel(Comment comment) {
+        if (comment.getUser() != null || comment.getUser().getImage() != null) {
+            mUsername = comment.getUser().getUsername();
+            mImageUrl = comment.getUser().getImage().getPhotoUrl();
+        }
         mCommentText = comment.getComment();
-        mUsername = comment.getUser().getUsername();
     }
 
     public String getImageUrl() {

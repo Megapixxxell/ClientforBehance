@@ -1,27 +1,23 @@
 package com.example.clientforbehance.common;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.clientforbehance.R;
-import com.example.clientforbehance.data.model.Storage;
-import com.example.clientforbehance.AppDelegate;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 
+
+    private boolean mFragmentPopped;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayout());
-
-
-        if (savedInstanceState == null) {
-            changeFragment(getFragment());
-        }
+        changeFragment(getFragment());
     }
 
     protected int getLayout() {
@@ -30,20 +26,28 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     protected abstract Fragment getFragment();
 
-
     public void changeFragment(Fragment fragment) {
-        boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer) != null;
+        String backStateName = fragment.getClass().getName();
+        FragmentManager manager = getSupportFragmentManager();
+        mFragmentPopped = manager.popBackStackImmediate (backStateName, 0);
 
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, fragment);
-
-        if (addToBackStack) {
-            transaction.addToBackStack(fragment.getClass().getSimpleName());
+        if (!mFragmentPopped) {
+            FragmentTransaction ft = manager
+                    .beginTransaction();
+                    ft.replace(R.id.fragmentContainer, fragment, backStateName);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    ft.addToBackStack(backStateName);
+                    ft.commit();
         }
-
-        transaction.commit();
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1 || !mFragmentPopped){
+            finish();
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
 }

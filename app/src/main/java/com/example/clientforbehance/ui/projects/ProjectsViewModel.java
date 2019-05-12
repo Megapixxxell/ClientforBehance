@@ -1,59 +1,54 @@
 package com.example.clientforbehance.ui.projects;
 
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableBoolean;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
+import android.arch.paging.PagedList;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.example.clientforbehance.data.model.Storage;
-import com.example.clientforbehance.data.model.project.Project;
+import com.example.clientforbehance.data.model.project.ProjectResponse;
+import com.example.clientforbehance.data.model.project.RichProject;
 import com.example.clientforbehance.utils.ApiUtils;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProjectsViewModel {
+public class ProjectsViewModel extends ViewModel {
 
     private Disposable mDisposable;
     private Storage mStorage;
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
-    private String mQuery;
+    private String mQuery = "Android";
 
-    private ObservableBoolean mIsLoading = new ObservableBoolean(false);
-    private ObservableBoolean mIsErrorVisible = new ObservableBoolean(false);
-    private ObservableArrayList<Project> mProjects = new ObservableArrayList<>();
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            loadProjects(mQuery);
-        }
-    };
+    private MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
+    private LiveData<PagedList<RichProject>> mProjects;
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = () -> updateProjects(mQuery);
 
-    ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener onItemClickListener) {
+    public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener onItemClickListener) {
         mStorage = storage;
         mOnItemClickListener = onItemClickListener;
+        mProjects = mStorage.getPagedProjects();
+        updateProjects(mQuery);
     }
 
-
-    void loadProjects(String querry) {
+    void updateProjects(String querry) {
         mDisposable = ApiUtils.getApiService().getProjects(querry)
-                .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
-                .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getProjectResponseFromStorage() : null)
+                .map(ProjectResponse::getProjects)
+                .doOnSubscribe(disposable -> mIsLoading.postValue(true))
+                .doFinally(() -> mIsLoading.postValue(false))
+                .doOnSuccess(projectResponse -> mIsErrorVisible.postValue(false))
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mIsLoading.set(true))
-                .doFinally(() -> mIsLoading.set(false))
                 .subscribe(response -> {
-                            mIsErrorVisible.set(false);
+                            mStorage.insertProjectsToBaseFromList(response);
                             mQuery = querry;
-                            mProjects.clear();
-                            mProjects.addAll(response.getProjects());
                         },
-                        throwable -> mIsErrorVisible.set(true));
+                        throwable -> mIsErrorVisible.postValue(mProjects.getValue() == null || mProjects.getValue().size() == 0));
     }
 
-    void dispatchDetach() {
+    @Override
+    protected void onCleared() {
         mStorage = null;
         if (mDisposable != null) mDisposable.dispose();
     }
@@ -62,15 +57,15 @@ public class ProjectsViewModel {
         return mOnItemClickListener;
     }
 
-    public ObservableBoolean getIsLoading() {
+    public MutableLiveData<Boolean> getIsLoading() {
         return mIsLoading;
     }
 
-    public ObservableBoolean getIsErrorVisible() {
+    public MutableLiveData<Boolean> getIsErrorVisible() {
         return mIsErrorVisible;
     }
 
-    public ObservableArrayList<Project> getProjects() {
+    public LiveData<PagedList<RichProject>> getProjects() {
         return mProjects;
     }
 

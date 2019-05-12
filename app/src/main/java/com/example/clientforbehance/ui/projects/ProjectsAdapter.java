@@ -1,23 +1,23 @@
 package com.example.clientforbehance.ui.projects;
 
+import android.annotation.SuppressLint;
+import android.arch.paging.PagedListAdapter;
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.example.clientforbehance.data.model.project.Project;
+import com.example.clientforbehance.data.model.project.RichProject;
 import com.example.clientforbehance.databinding.ProjectBinding;
 
-import java.util.List;
+public class ProjectsAdapter extends PagedListAdapter<RichProject, ProjectsHolder> {
 
-public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
-
-    private final List<Project> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
-    public ProjectsAdapter(List<Project> projects, OnItemClickListener onItemClickListener) {
+    public ProjectsAdapter(OnItemClickListener onItemClickListener) {
+        super(CALLBACK);
         mOnItemClickListener = onItemClickListener;
-        mProjects = projects;
     }
 
     @NonNull
@@ -31,17 +31,27 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ProjectsHolder viewHolder, int i) {
-        Project project = mProjects.get(i);
-        viewHolder.bind(project, mOnItemClickListener);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mProjects.size();
+        RichProject project = getItem(i);
+        if (project != null)
+            viewHolder.bind(project, mOnItemClickListener);
     }
 
     public interface OnItemClickListener {
-        void onAuthorClick(String username);
+        void onAuthorClick(Context context, String username);
+
         void onCommentsClick(int projectId);
     }
+
+    private static final DiffUtil.ItemCallback<RichProject> CALLBACK = new DiffUtil.ItemCallback<RichProject>() {
+        @Override
+        public boolean areItemsTheSame(RichProject oldItem, RichProject newItem) {
+            return oldItem.mProject.getId() == newItem.mProject.getId();
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(RichProject oldItem, @NonNull RichProject newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 }

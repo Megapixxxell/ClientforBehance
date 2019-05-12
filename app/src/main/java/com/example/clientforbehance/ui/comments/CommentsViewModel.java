@@ -1,70 +1,63 @@
 package com.example.clientforbehance.ui.comments;
 
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableBoolean;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
+import android.arch.paging.PagedList;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.comment.Comment;
+import com.example.clientforbehance.data.model.comment.CommentResponse;
 import com.example.clientforbehance.utils.ApiUtils;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class CommentsViewModel {
+public class CommentsViewModel extends ViewModel {
 
     private Disposable mDisposable;
     private Storage mStorage;
     private int mProjectId;
 
-    private ObservableBoolean mIsLoading = new ObservableBoolean(false);
-    private ObservableBoolean mIsErrorVisible = new ObservableBoolean(false);
-    private ObservableArrayList<Comment> mComments = new ObservableArrayList<>();
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            loadComments(mProjectId);
-        }
-    };
+    private MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
+    private LiveData<PagedList<Comment>> mComments;
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = this::updateComments;
 
-    CommentsViewModel(Storage storage) {
+    public CommentsViewModel(Storage storage, int projectId) {
         mStorage = storage;
+        mProjectId = projectId;
+        mComments = mStorage.getPagedComments();
+        updateComments();
     }
 
-
-    void loadComments(int projectId) {
-        mDisposable = ApiUtils.getApiService().getProjectComments(projectId)
-                .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse))
-                .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getCommentResponseFromStorage() : null)
+    private void updateComments() {
+        mDisposable = ApiUtils.getApiService().getProjectComments(mProjectId)
+                .map(CommentResponse::getComments)
+                .doOnSubscribe(disposable -> mIsLoading.postValue(true))
+                .doFinally(() -> mIsLoading.postValue(false))
+                .doOnSuccess(commentResponse -> mIsErrorVisible.postValue(false))
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mIsLoading.set(true))
-                .doFinally(() -> mIsLoading.set(false))
-                .subscribe(response -> {
-                            mIsErrorVisible.set(false);
-                            mComments.clear();
-                            mProjectId = projectId;
-                            mComments.addAll(response.getComments());
-                        },
-                        throwable -> mIsErrorVisible.set(true));
+                .subscribe(response -> mStorage.insertCommentsToBaseFromList(response),
+                        throwable -> mIsErrorVisible.postValue(mComments.getValue() == null || mComments.getValue().size() == 0));
     }
 
-    void dispatchDetach() {
+    @Override
+    protected void onCleared() {
         mStorage = null;
         if (mDisposable != null) mDisposable.dispose();
     }
 
-    public ObservableBoolean getIsLoading() {
+    public MutableLiveData<Boolean> getIsLoading() {
         return mIsLoading;
     }
 
-    public ObservableBoolean getIsErrorVisible() {
+    public MutableLiveData<Boolean> getIsErrorVisible() {
         return mIsErrorVisible;
     }
 
-    public ObservableArrayList<Comment> getComments() {
+    public LiveData<PagedList<Comment>> getComments() {
         return mComments;
     }
 

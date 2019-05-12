@@ -2,22 +2,17 @@ package com.example.clientforbehance.data.model.project;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-@Entity(foreignKeys = @ForeignKey(
-        entity = Project.class,
-        parentColumns = "id",
-        childColumns = "project_id"
-))
+@Entity
 public class Stats implements Serializable {
 
     @PrimaryKey
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "stats_id")
     private int mId;
 
     @ColumnInfo(name = "views")
@@ -31,9 +26,6 @@ public class Stats implements Serializable {
     @ColumnInfo(name = "comments")
     @SerializedName("comments")
     private int mComments;
-
-    @ColumnInfo(name = "project_id")
-    private int mProjectId;
 
     public int getId() {
         return mId;
@@ -68,11 +60,4 @@ public class Stats implements Serializable {
         mComments = comments;
     }
 
-    public int getProjectId() {
-        return mProjectId;
-    }
-
-    public void setProjectId(int projectId) {
-        mProjectId = projectId;
-    }
 }

@@ -1,6 +1,6 @@
 package com.example.clientforbehance.ui.projects;
 
-import com.example.clientforbehance.data.model.project.Project;
+import com.example.clientforbehance.data.model.project.RichProject;
 import com.example.clientforbehance.utils.DateUtils;
 
 public class ProjectListItemViewModel {
@@ -15,17 +15,19 @@ public class ProjectListItemViewModel {
     private String mComments;
     private int mProjectId;
 
-    public ProjectListItemViewModel (Project project) {
+    ProjectListItemViewModel(RichProject project) {
 
-        mCoverImageUrl = project.getCover().getPhotoUrl();
-        mUserImageUrl = project.getOwners().get(0).getImage().getPhotoUrl();
-        mName = project.getName();
-        mUsername = project.getOwners().get(0).getUsername();
-        mPublishedOn = DateUtils.format(project.getPublishedOn());
-        mLikes = String.valueOf(project.getStats().getAppreciations());
-        mViews = String.valueOf(project.getStats().getViews());
-        mComments = String.valueOf(project.getStats().getComments());
-        mProjectId = project.getId();
+        if (project.mOwners != null && project.mOwners.size() != 0) {
+            mUserImageUrl = project.mOwners.get(0).getImage().getPhotoUrl();
+            mUsername = project.mOwners.get(0).getUsername();
+        }
+        mCoverImageUrl = project.mProject.getCover().getPhotoUrl();
+        mName = project.mProject.getName();
+        mPublishedOn = DateUtils.format(project.mProject.getPublishedOn());
+        mLikes = String.valueOf(project.mProject.getStats().getAppreciations());
+        mViews = String.valueOf(project.mProject.getStats().getViews());
+        mComments = String.valueOf(project.mProject.getStats().getComments());
+        mProjectId = project.mProject.getId();
 
     }
 

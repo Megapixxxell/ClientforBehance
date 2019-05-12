@@ -1,98 +1,64 @@
 package com.example.clientforbehance.ui.user;
 
-import android.databinding.ObservableBoolean;
-import android.databinding.ObservableField;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.user.User;
+import com.example.clientforbehance.data.model.user.UserResponse;
 import com.example.clientforbehance.utils.ApiUtils;
-import com.example.clientforbehance.utils.DateUtils;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class UserViewModel {
+public class UserViewModel extends ViewModel {
 
     private Disposable mDisposable;
     private Storage mStorage;
-    private String mUsernameStr;
+    private String mUsername;
 
-    private ObservableField<String> mUserImageUrl = new ObservableField<>();
-    private ObservableField<String> mUsername = new ObservableField<>();
-    private ObservableField<String> mUserCreatedOn = new ObservableField<>();
-    private ObservableField<String> mUserLocation = new ObservableField<>();
-    private ObservableField<String> mName = new ObservableField<>();
+    private LiveData<User> mUser;
 
-    private ObservableBoolean mIsLoading = new ObservableBoolean(false);
-    private ObservableBoolean mIsErrorVisible = new ObservableBoolean(false);
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            loadUser(mUsernameStr);
-        }
-    };
+    private MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = this::updateUserInfo;
 
-    UserViewModel(Storage storage) {
+    public UserViewModel(Storage storage, String username) {
         mStorage = storage;
+        mUsername = username;
+        mUser = mStorage.getLiveUserByName(username);
+        updateUserInfo();
     }
 
-    void loadUser(String usernameStr) {
-        mDisposable = ApiUtils.getApiService().getUserInfo(usernameStr)
+    private void updateUserInfo() {
+        mDisposable = ApiUtils.getApiService().getUserInfo(mUsername)
+                .map(UserResponse::getUser)
+                .doOnSubscribe(disposable -> mIsLoading.postValue(true))
+                .doFinally(() -> mIsLoading.postValue(false))
+                .doOnSuccess(userResponse -> mIsErrorVisible.postValue(false))
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(userResponse -> mStorage.insertUser(userResponse))
-                .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getUser(mUsernameStr) : null)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mIsLoading.set(true))
-                .doFinally(() -> mIsLoading.set(false))
-                .subscribe(userResponse -> {
-                    mIsErrorVisible.set(false);
-                    mUsernameStr = usernameStr;
-                    getUserInfo(userResponse.getUser());
-                }, throwable -> mIsErrorVisible.set(true));
+                .subscribe(response -> mStorage.insertUser(response),
+                        throwable -> mIsErrorVisible.postValue(mStorage.getLiveUserByName(mUsername).getValue() == null));
     }
 
-    private void getUserInfo(User user) {
-        mUserImageUrl.set(user.getImage().getPhotoUrl());
-        mUsername.set(user.getUsername());
-        mUserCreatedOn.set(DateUtils.format(user.getCreatedOn()));
-        mUserLocation.set(user.getLocation());
-        mName.set(user.getDisplayName());
-    }
-
-    void dispatchDetach() {
+    @Override
+    protected void onCleared() {
         mStorage = null;
         if (mDisposable != null) mDisposable.dispose();
     }
 
-    public ObservableBoolean getIsLoading() {
+    public LiveData<User> getUser() {
+        return mUser;
+    }
+
+    public MutableLiveData<Boolean> getIsLoading() {
         return mIsLoading;
     }
 
-    public ObservableBoolean getIsErrorVisible() {
+    public MutableLiveData<Boolean> getIsErrorVisible() {
         return mIsErrorVisible;
-    }
-
-    public ObservableField<String> getUserImageUrl() {
-        return mUserImageUrl;
-    }
-
-    public ObservableField<String> getUsername() {
-        return mUsername;
-    }
-
-    public ObservableField<String> getUserCreatedOn() {
-        return mUserCreatedOn;
-    }
-
-    public ObservableField<String> getUserLocation() {
-        return mUserLocation;
-    }
-
-    public ObservableField<String> getName() {
-        return mName;
     }
 
     public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {

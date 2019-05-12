@@ -1,9 +1,9 @@
 package com.example.clientforbehance.data.model.project;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.example.clientforbehance.data.model.user.Image;
@@ -30,7 +30,7 @@ public class Owner implements Serializable {
     private int mProjectId;
 
     @SerializedName("images")
-    @Ignore
+    @Embedded
     private Image mImage;
 
     public int getId() {

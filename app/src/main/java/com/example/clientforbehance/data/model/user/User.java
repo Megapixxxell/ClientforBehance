@@ -1,12 +1,10 @@
 package com.example.clientforbehance.data.model.user;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.example.clientforbehance.data.model.comment.Comment;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -15,7 +13,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @PrimaryKey
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "user_id")
     @SerializedName("id")
     private int mId;
 
@@ -31,7 +29,7 @@ public class User implements Serializable {
     @SerializedName("location")
     private String mLocation;
 
-    @ColumnInfo(name = "created_on")
+    @ColumnInfo(name = "user_created_on")
     @SerializedName("created_on")
     private long mCreatedOn;
 
@@ -40,11 +38,8 @@ public class User implements Serializable {
     private String mDisplayName;
 
     @SerializedName("images")
-    @Ignore
+    @Embedded
     private Image mImage;
-
-    @ColumnInfo(name = "comment_id")
-    private long mCommentId;
 
     public int getId() {
         return mId;
@@ -102,11 +97,4 @@ public class User implements Serializable {
         mLocation = location;
     }
 
-    public long getCommentId() {
-        return mCommentId;
-    }
-
-    public void setCommentId(long commentId) {
-        mCommentId = commentId;
-    }
 }

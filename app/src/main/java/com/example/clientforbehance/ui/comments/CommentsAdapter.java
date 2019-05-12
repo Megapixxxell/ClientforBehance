@@ -1,21 +1,19 @@
 package com.example.clientforbehance.ui.comments;
 
+import android.annotation.SuppressLint;
+import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.databinding.CommentBinding;
 
-import java.util.List;
+public class CommentsAdapter extends PagedListAdapter<Comment, CommentsHolder> {
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
-
-    private List<Comment> mComments;
-
-    public CommentsAdapter (List<Comment> comments) {
-        mComments = comments;
+    public CommentsAdapter() {
+        super(CALLBACK);
     }
 
     @NonNull
@@ -28,12 +26,20 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CommentsHolder commentsHolder, int i) {
-        Comment comment = mComments.get(i);
-        commentsHolder.bind(comment);
+        Comment comment = getItem(i);
+        if (comment != null) commentsHolder.bind(comment);
     }
 
-    @Override
-    public int getItemCount() {
-        return mComments == null ? 0 : mComments.size();
-    }
+    private static final DiffUtil.ItemCallback<Comment> CALLBACK = new DiffUtil.ItemCallback<Comment>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Comment comment, @NonNull Comment t1) {
+            return comment.getId() == t1.getId();
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(@NonNull Comment comment, @NonNull Comment t1) {
+            return comment.equals(t1);
+        }
+    };
 }
