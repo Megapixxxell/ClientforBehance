@@ -1,24 +1,29 @@
 package com.example.clientforbehance.ui.comments;
 
 import com.example.clientforbehance.common.BasePresenter;
+import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.utils.ApiUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class CommentsPresenter extends BasePresenter {
 
-    private Storage mStorage;
-    private CommentsView mCommentsView;
-
-    public CommentsPresenter(Storage storage, CommentsView commentsView) {
-        mStorage = storage;
-        mCommentsView = commentsView;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
+    @Inject
+    CommentsView mCommentsView;
+    @Inject
+    CommentsPresenter() {
     }
 
     void getComments (int projectId) {
-        mCompositeDisposable.add(ApiUtils.getApiService().getProjectComments(projectId)
+        mCompositeDisposable.add(mApi.getProjectComments(projectId)
                 .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getCommentResponseFromStorage() : null)

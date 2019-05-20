@@ -1,27 +1,31 @@
 package com.example.clientforbehance.ui.projects;
 
-import android.view.View;
-
 import com.example.clientforbehance.common.BasePresenter;
+import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.utils.ApiUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class ProjectsPresenter extends BasePresenter {
 
-    private ProjectsView mView;
-    private Storage mStorage;
+    @Inject
+    ProjectsView mView;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
 
-    public ProjectsPresenter(ProjectsView view, Storage storage) {
-        mView = view;
-        mStorage = storage;
+    @Inject
+    ProjectsPresenter() {
     }
 
-    public void getProjects(String query) {
+    void getProjects(String query) {
 
-        mCompositeDisposable.add(ApiUtils.getApiService().getProjects(query)
+        mCompositeDisposable.add(mApi.getProjects(query)
                 .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getProjectResponseFromStorage() : null)
@@ -33,10 +37,11 @@ public class ProjectsPresenter extends BasePresenter {
                         throwable -> mView.showError()));
     }
 
-    public void openUserFragment(String username) {
+    void openUserFragment(String username) {
         mView.openUserFragment(username);
     }
-    public void openCommentsFragment(int projectId){
+
+    void openCommentsFragment(int projectId) {
         mView.openCommentsFragment(projectId);
     }
 }

@@ -135,11 +135,4 @@ public class Storage {
         commentResponse.setComments(comments);
         return commentResponse;
     }
-
-
-    public interface StorageOwner {
-        Storage obtainStorage();
-    }
-
-
 }

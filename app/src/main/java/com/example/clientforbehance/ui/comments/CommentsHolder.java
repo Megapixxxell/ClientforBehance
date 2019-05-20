@@ -10,12 +10,12 @@ import com.example.clientforbehance.R;
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.squareup.picasso.Picasso;
 
-public class CommentsHolder extends RecyclerView.ViewHolder {
+class CommentsHolder extends RecyclerView.ViewHolder {
 
     private ImageView mImage;
     private TextView mCommentText, mUsername;
 
-    public CommentsHolder(@NonNull View itemView) {
+    CommentsHolder(@NonNull View itemView) {
         super(itemView);
         mImage = itemView.findViewById(R.id.iv_comment);
         mCommentText = itemView.findViewById(R.id.text_comment);
@@ -31,7 +31,9 @@ public class CommentsHolder extends RecyclerView.ViewHolder {
         }
 
 
-        mUsername.setText(comment.getUser().getUsername());
+        if (comment.getUser() != null) {
+            mUsername.setText(comment.getUser().getUsername());
+        }
         mCommentText.setText(comment.getComment());
     }
 

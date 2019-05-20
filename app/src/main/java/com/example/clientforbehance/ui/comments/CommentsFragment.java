@@ -10,24 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.data.model.Storage;
+import com.example.clientforbehance.dagger2.CommentModule;
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class CommentsFragment extends PresenterFragment<CommentsPresenter> implements Refreshable, CommentsView {
 
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
-    private Storage mStorage;
     private CommentsAdapter mCommentsAdapter;
-    private CommentsPresenter mCommentsPresenter;
+    @Inject
+    CommentsPresenter mCommentsPresenter;
 
     private int mProjectId;
 
@@ -40,13 +43,15 @@ public class CommentsFragment extends PresenterFragment<CommentsPresenter> imple
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Storage.StorageOwner) {
-            mStorage = ((Storage.StorageOwner) context).obtainStorage();
-        }
-
         if (context instanceof RefreshOwner) {
             mRefreshOwner = (RefreshOwner) context;
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppDelegate.getAppComponent().createCommentComponent(new CommentModule(this)).inject(this);
     }
 
     @Nullable
@@ -72,7 +77,6 @@ public class CommentsFragment extends PresenterFragment<CommentsPresenter> imple
             getActivity().setTitle(R.string.comments);
         }
 
-        mCommentsPresenter = new CommentsPresenter(mStorage, this);
         mCommentsAdapter = new CommentsAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mCommentsAdapter);
@@ -81,7 +85,6 @@ public class CommentsFragment extends PresenterFragment<CommentsPresenter> imple
 
     @Override
     public void onDetach() {
-        mStorage = null;
         mRefreshOwner = null;
         super.onDetach();
     }

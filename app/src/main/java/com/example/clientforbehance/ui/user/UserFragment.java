@@ -10,15 +10,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.data.model.Storage;
+import com.example.clientforbehance.dagger2.UserModule;
 import com.example.clientforbehance.data.model.user.User;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 import com.example.clientforbehance.utils.DateUtils;
 import com.squareup.picasso.Picasso;
+
+import javax.inject.Inject;
 
 
 public class UserFragment extends PresenterFragment<UserPresenter> implements Refreshable, UserView {
@@ -31,8 +34,9 @@ public class UserFragment extends PresenterFragment<UserPresenter> implements Re
     private String mUsernameStr;
 
     private RefreshOwner mRefreshOwner;
-    private UserPresenter mUserPresenter;
-    private Storage mStorage;
+    @Inject
+    UserPresenter mUserPresenter;
+
 
     public static UserFragment newInstance(Bundle args) {
 
@@ -44,8 +48,13 @@ public class UserFragment extends PresenterFragment<UserPresenter> implements Re
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mStorage = context instanceof Storage.StorageOwner ? ((Storage.StorageOwner) context).obtainStorage() : null;
         mRefreshOwner = context instanceof RefreshOwner ? (RefreshOwner) context : null;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppDelegate.getAppComponent().createUserComponent(new UserModule(this)).inject(this);
     }
 
     @Nullable
@@ -76,7 +85,6 @@ public class UserFragment extends PresenterFragment<UserPresenter> implements Re
         if (getActivity() != null) {
             getActivity().setTitle(mUsernameStr);
         }
-        mUserPresenter = new UserPresenter(mStorage, this);
         onRefreshData();
     }
 
@@ -88,7 +96,6 @@ public class UserFragment extends PresenterFragment<UserPresenter> implements Re
 
     @Override
     public void onDetach() {
-        mStorage = null;
         mRefreshOwner = null;
         super.onDetach();
     }

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,24 +15,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
-import com.example.clientforbehance.common.BasePresenter;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.data.model.Storage;
+import com.example.clientforbehance.dagger2.ProjectModule;
 import com.example.clientforbehance.data.model.project.Project;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
-import com.example.clientforbehance.utils.ApiUtils;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-
-import android.support.v7.widget.SearchView;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
         implements ProjectsView, Refreshable, ProjectsAdapter.OnItemClickListener {
@@ -45,9 +41,9 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
-    private Storage mStorage;
     private ProjectsAdapter mProjectsAdapter;
-    private ProjectsPresenter mProjectsPresenter;
+    @Inject
+    ProjectsPresenter mProjectsPresenter;
 
 
     public static ProjectFragment newInstance() {
@@ -62,10 +58,6 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Storage.StorageOwner) {
-            mStorage = ((Storage.StorageOwner) context).obtainStorage();
-        }
-
         if (context instanceof RefreshOwner) {
             mRefreshOwner = (RefreshOwner) context;
         }
@@ -75,6 +67,8 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        AppDelegate.getAppComponent().createProjectComponent(new ProjectModule(this)).inject(this);
     }
 
     @Nullable
@@ -97,8 +91,6 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
             getActivity().setTitle(R.string.projects);
         }
 
-        mProjectsPresenter = new ProjectsPresenter(this, mStorage);
-
         mProjectsAdapter = new ProjectsAdapter(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mProjectsAdapter);
@@ -108,7 +100,6 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
 
     @Override
     public void onDetach() {
-        mStorage = null;
         mRefreshOwner = null;
         super.onDetach();
     }

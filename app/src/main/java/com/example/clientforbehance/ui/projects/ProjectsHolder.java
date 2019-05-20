@@ -50,7 +50,7 @@ class ProjectsHolder extends RecyclerView.ViewHolder {
         mViews.setText(String.valueOf(project.getStats().getViews()));
         mComments.setText(String.valueOf(project.getStats().getComments()));
 
-        mUserImage.setOnClickListener((v -> {onItemClickListener.onAuthorClick(username);}));
+        mUserImage.setOnClickListener((v -> onItemClickListener.onAuthorClick(username)));
         mCommentsImage.setOnClickListener((v -> onItemClickListener.onCommentsClick(projectId)));
 
     }

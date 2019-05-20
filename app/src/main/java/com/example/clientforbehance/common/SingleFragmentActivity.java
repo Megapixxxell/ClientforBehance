@@ -11,7 +11,7 @@ import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.AppDelegate;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity implements RefreshOwner,
-        SwipeRefreshLayout.OnRefreshListener, Storage.StorageOwner {
+        SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -28,11 +28,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     }
 
     protected abstract Fragment getFragment();
-
-    @Override
-    public Storage obtainStorage() {
-        return ((AppDelegate) getApplicationContext()).getStorage();
-    }
 
     public void changeFragment(Fragment fragment) {
         boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragment_container) != null;
