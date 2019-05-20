@@ -15,6 +15,7 @@ public class UserModule {
     }
 
     @Provides
+    @PerFragment
     UserView provideUserView() {
         return mUserView;
     }

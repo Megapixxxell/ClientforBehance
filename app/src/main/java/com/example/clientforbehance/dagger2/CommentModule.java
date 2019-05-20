@@ -15,6 +15,7 @@ public class CommentModule {
     }
 
     @Provides
+    @PerFragment
     CommentsView provideCommentsView() {
         return mCommentsView;
     }

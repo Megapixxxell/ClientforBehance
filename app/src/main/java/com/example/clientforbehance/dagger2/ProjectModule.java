@@ -15,6 +15,7 @@ public class ProjectModule {
     }
 
     @Provides
+    @PerFragment
     ProjectsView provideProjectView () {
         return mView;
     }
