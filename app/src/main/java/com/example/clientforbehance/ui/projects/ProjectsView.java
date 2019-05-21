@@ -5,6 +5,7 @@ import com.example.clientforbehance.data.model.project.Project;
 
 import java.util.List;
 
+
 public interface ProjectsView extends BaseView {
 
     void showProjects(List<Project> projects);

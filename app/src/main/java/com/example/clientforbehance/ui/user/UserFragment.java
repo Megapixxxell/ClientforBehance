@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
@@ -24,7 +26,7 @@ import com.squareup.picasso.Picasso;
 import javax.inject.Inject;
 
 
-public class UserFragment extends PresenterFragment<UserPresenter> implements Refreshable, UserView {
+public class UserFragment extends PresenterFragment implements Refreshable, UserView {
 
     private ImageView mUserImage;
     private TextView mUsername, mUserCreatedOn, mUserLocation, mName;
@@ -35,7 +37,13 @@ public class UserFragment extends PresenterFragment<UserPresenter> implements Re
 
     private RefreshOwner mRefreshOwner;
     @Inject
+    @InjectPresenter
     UserPresenter mUserPresenter;
+
+    @ProvidePresenter
+    UserPresenter provideUserPresenter () {
+        return mUserPresenter;
+    }
 
 
     public static UserFragment newInstance(Bundle args) {

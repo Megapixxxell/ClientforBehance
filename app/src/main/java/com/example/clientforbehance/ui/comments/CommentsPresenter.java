@@ -1,5 +1,6 @@
 package com.example.clientforbehance.ui.comments;
 
+import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
 import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
@@ -10,7 +11,8 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class CommentsPresenter extends BasePresenter {
+@InjectViewState
+public class CommentsPresenter extends BasePresenter<CommentsView> {
 
     @Inject
     Storage mStorage;

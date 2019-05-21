@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
@@ -29,7 +31,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
+public class ProjectFragment extends PresenterFragment
         implements ProjectsView, Refreshable, ProjectsAdapter.OnItemClickListener {
 
     public static final String USERNAME_KEY = "username";
@@ -43,7 +45,13 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     private View mErrorView;
     private ProjectsAdapter mProjectsAdapter;
     @Inject
+    @InjectPresenter
     ProjectsPresenter mProjectsPresenter;
+
+    @ProvidePresenter
+    ProjectsPresenter providePresenter () {
+        return mProjectsPresenter;
+    }
 
 
     public static ProjectFragment newInstance() {
@@ -108,7 +116,7 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
 
-        MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
         SearchView searchView;
 
         searchView = (SearchView) myActionMenuItem.getActionView();
@@ -118,7 +126,7 @@ public class ProjectFragment extends PresenterFragment<ProjectsPresenter>
 
                 mQuery = s;
                 mProjectsPresenter.getProjects(mQuery);
-                if( ! searchView.isIconified()) {
+                if (!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }
                 myActionMenuItem.collapseActionView();
