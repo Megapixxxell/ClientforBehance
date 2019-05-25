@@ -4,9 +4,12 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.support.v4.widget.SwipeRefreshLayout;
 
+import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.comment.Comment;
 import com.example.clientforbehance.utils.ApiUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -15,7 +18,10 @@ import io.reactivex.schedulers.Schedulers;
 public class CommentsViewModel {
 
     private Disposable mDisposable;
-    private Storage mStorage;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
     private int mProjectId;
 
     private ObservableBoolean mIsLoading = new ObservableBoolean(false);
@@ -28,13 +34,12 @@ public class CommentsViewModel {
         }
     };
 
-    CommentsViewModel(Storage storage) {
-        mStorage = storage;
+    CommentsViewModel() {
     }
 
 
     void loadComments(int projectId) {
-        mDisposable = ApiUtils.getApiService().getProjectComments(projectId)
+        mDisposable = mApi.getProjectComments(projectId)
                 .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getCommentResponseFromStorage() : null)

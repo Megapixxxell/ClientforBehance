@@ -1,5 +1,7 @@
 package com.example.clientforbehance.ui.projects;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
-import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.databinding.ProjectsBinding;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
+
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 public class ProjectFragment extends Fragment {
 
@@ -50,16 +55,14 @@ public class ProjectFragment extends Fragment {
         }
     };
 
-
-    public static ProjectFragment newInstance() { return new ProjectFragment(); }
+    public static ProjectFragment newInstance() {
+        return new ProjectFragment();
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Storage.StorageOwner) {
-            Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            mProjectsViewModel = new ProjectsViewModel(storage, mOnItemClickListener);
-        }
+        mProjectsViewModel = new ProjectsViewModel(mOnItemClickListener);
     }
 
     @Override
@@ -82,7 +85,9 @@ public class ProjectFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(R.string.projects);
         }
-        mProjectsViewModel.loadProjects(mQuerry);
+        Scope scope = Toothpick.openScope(AppDelegate.class);
+        Toothpick.inject(this, scope);
+//        mProjectsViewModel.loadProjects(mQuerry);
     }
 
     @Override
@@ -120,5 +125,7 @@ public class ProjectFragment extends Fragment {
 
         super.onCreateOptionsMenu(menu, inflater);
     }
+
+
 
 }

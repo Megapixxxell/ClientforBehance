@@ -4,18 +4,26 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.support.v4.widget.SwipeRefreshLayout;
 
+import com.example.clientforbehance.AppDelegate;
+import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.project.Project;
 import com.example.clientforbehance.utils.ApiUtils;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import toothpick.Toothpick;
 
 public class ProjectsViewModel {
 
     private Disposable mDisposable;
-    private Storage mStorage;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
     private String mQuery;
 
@@ -29,14 +37,13 @@ public class ProjectsViewModel {
         }
     };
 
-    ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener onItemClickListener) {
-        mStorage = storage;
+    ProjectsViewModel(ProjectsAdapter.OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
 
 
     void loadProjects(String querry) {
-        mDisposable = ApiUtils.getApiService().getProjects(querry)
+        mDisposable = mApi.getProjects(querry)
                 .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
                         mStorage.getProjectResponseFromStorage() : null)

@@ -9,9 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.databinding.UserBinding;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
+
+import toothpick.Toothpick;
 
 public class UserFragment extends Fragment {
 
@@ -26,8 +29,7 @@ public class UserFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Storage storage = context instanceof Storage.StorageOwner ? ((Storage.StorageOwner) context).obtainStorage() : null;
-        mUserViewModel = new UserViewModel(storage);
+        mUserViewModel = new UserViewModel();
     }
 
     @Nullable
@@ -49,6 +51,8 @@ public class UserFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(usernameStr);
         }
+
+        Toothpick.inject(this, AppDelegate.getAppScope());
 
         mUserViewModel.loadUser(usernameStr);
     }

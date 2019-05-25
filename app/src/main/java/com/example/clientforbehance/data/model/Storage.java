@@ -84,7 +84,6 @@ public class Storage {
     public void insertUser(UserResponse response) {
         User user = response.getUser();
 
-//        user.setCommentId(0L);
         Image image = user.getImage();
         image.setId(user.getId());
         image.setUserId(user.getId());
@@ -110,8 +109,6 @@ public class Storage {
         mBehanceDao.insertComments(comments);
 
         mBehanceDao.insertUsers(getUsersFromComments(comments));
-
-
     }
 
     public List<UserComment> getUsersFromComments (List<Comment> comments) {
@@ -135,11 +132,4 @@ public class Storage {
         commentResponse.setComments(comments);
         return commentResponse;
     }
-
-
-    public interface StorageOwner {
-        Storage obtainStorage();
-    }
-
-
 }

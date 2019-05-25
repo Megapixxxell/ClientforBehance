@@ -4,10 +4,13 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.v4.widget.SwipeRefreshLayout;
 
+import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.user.User;
 import com.example.clientforbehance.utils.ApiUtils;
 import com.example.clientforbehance.utils.DateUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -16,7 +19,10 @@ import io.reactivex.schedulers.Schedulers;
 public class UserViewModel {
 
     private Disposable mDisposable;
-    private Storage mStorage;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
     private String mUsernameStr;
 
     private ObservableField<String> mUserImageUrl = new ObservableField<>();
@@ -34,12 +40,11 @@ public class UserViewModel {
         }
     };
 
-    UserViewModel(Storage storage) {
-        mStorage = storage;
+    UserViewModel() {
     }
 
     void loadUser(String usernameStr) {
-        mDisposable = ApiUtils.getApiService().getUserInfo(usernameStr)
+        mDisposable = mApi.getUserInfo(usernameStr)
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(userResponse -> mStorage.insertUser(userResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?

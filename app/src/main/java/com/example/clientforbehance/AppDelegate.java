@@ -1,26 +1,37 @@
 package com.example.clientforbehance;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
 
-import com.example.clientforbehance.data.database.BehanceDatabase;
-import com.example.clientforbehance.data.model.Storage;
+import com.example.clientforbehance.toothpick.AppModule;
+import com.example.clientforbehance.toothpick.NetworkModule;
+
+import toothpick.Scope;
+import toothpick.Toothpick;
+import toothpick.configuration.Configuration;
+import toothpick.registries.FactoryRegistryLocator;
+import toothpick.registries.MemberInjectorRegistryLocator;
+import toothpick.smoothie.module.SmoothieApplicationModule;
 
 public class AppDelegate extends Application {
 
-    private Storage mStorage;
+    private static Scope sAppScope;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        final BehanceDatabase behanceDatabase = Room.databaseBuilder(this, BehanceDatabase.class,
-                "behance database").fallbackToDestructiveMigration().build();
+        Toothpick.setConfiguration(Configuration.forProduction().disableReflection());
 
-        mStorage = new Storage(behanceDatabase.getBehanceDao());
+        MemberInjectorRegistryLocator.setRootRegistry(new MemberInjectorRegistry());
+        FactoryRegistryLocator.setRootRegistry(new FactoryRegistry());
+
+        sAppScope = Toothpick.openScope(AppDelegate.class);
+        sAppScope.installModules(new SmoothieApplicationModule(this), new NetworkModule(), new AppModule(this));
+        Toothpick.inject(this, sAppScope);
+
     }
 
-    public Storage getStorage () {
-        return  mStorage;
+    public static Scope getAppScope() {
+        return sAppScope;
     }
 }

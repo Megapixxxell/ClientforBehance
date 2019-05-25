@@ -9,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
-import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.databinding.CommentsBindingg;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
+
+import toothpick.Toothpick;
 
 public class CommentsFragment extends Fragment {
 
@@ -29,10 +31,8 @@ public class CommentsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Storage.StorageOwner) {
-            Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            mCommentsViewModel = new CommentsViewModel(storage);
-        }
+        mCommentsViewModel = new CommentsViewModel();
+
     }
 
     @Nullable
@@ -53,6 +53,8 @@ public class CommentsFragment extends Fragment {
             getActivity().setTitle(R.string.comments);
         }
         mCommentsViewModel.loadComments(mProjectId);
+        Toothpick.inject(this, AppDelegate.getAppScope());
+
 
     }
 
