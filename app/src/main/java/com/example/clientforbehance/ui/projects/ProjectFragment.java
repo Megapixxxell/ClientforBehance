@@ -2,6 +2,7 @@ package com.example.clientforbehance.ui.projects;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import com.example.clientforbehance.R;
 import com.example.clientforbehance.databinding.ProjectsBinding;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
+
+import javax.inject.Inject;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -55,6 +58,11 @@ public class ProjectFragment extends Fragment {
         }
     };
 
+
+    public ProjectsAdapter.OnItemClickListener getOnItemClickListener() {
+        return mOnItemClickListener;
+    }
+
     public static ProjectFragment newInstance() {
         return new ProjectFragment();
     }
@@ -62,7 +70,7 @@ public class ProjectFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mProjectsViewModel = new ProjectsViewModel(mOnItemClickListener);
+//        mProjectsViewModel = new ProjectsViewModel(mOnItemClickListener);
     }
 
     @Override
@@ -85,8 +93,10 @@ public class ProjectFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(R.string.projects);
         }
-        Scope scope = Toothpick.openScope(AppDelegate.class);
+        Scope scope = AppDelegate.getAppScope();
         Toothpick.inject(this, scope);
+
+//        mProjectsViewModel = ViewModelProviders.of(this, factory).get(ProjectsViewModel.class);
 //        mProjectsViewModel.loadProjects(mQuerry);
     }
 

@@ -5,24 +5,27 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
+import com.example.clientforbehance.data.model.Storage;
+import com.example.clientforbehance.ui.projects.ProjectsAdapter;
+import com.example.clientforbehance.ui.projects.ProjectsViewModel;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import toothpick.Toothpick;
 
-@Singleton
+
 public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private Application mApplication;
+    private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
 
-    @Inject
-    public ViewModelFactory (Application app) {
-        mApplication = app;
+
+    public ViewModelFactory () {
     }
 
-    @NonNull
-    @Override
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) Toothpick.openScope(mApplication).getInstance(modelClass);
-    }
+//    @NonNull
+//    @Override
+//    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+//        return new ProjectsViewModel();
+//    }
 }

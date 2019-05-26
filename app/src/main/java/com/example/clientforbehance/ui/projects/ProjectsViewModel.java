@@ -1,5 +1,6 @@
 package com.example.clientforbehance.ui.projects;
 
+import android.arch.lifecycle.ViewModel;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,7 +18,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import toothpick.Toothpick;
 
-public class ProjectsViewModel {
+public class ProjectsViewModel extends ViewModel {
 
     private Disposable mDisposable;
     @Inject
