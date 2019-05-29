@@ -1,4 +1,4 @@
-package com.example.clientforbehance.utils;
+package com.example.domain;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;

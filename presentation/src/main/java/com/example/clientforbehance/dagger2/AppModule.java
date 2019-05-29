@@ -5,7 +5,6 @@ import android.arch.persistence.room.Room;
 import com.example.clientforbehance.AppDelegate;
 import com.example.data.database.BehanceDao;
 import com.example.data.database.BehanceDatabase;
-import com.example.data.Storage;
 
 import javax.inject.Singleton;
 

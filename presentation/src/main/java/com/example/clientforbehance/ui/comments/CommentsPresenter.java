@@ -2,9 +2,8 @@ package com.example.clientforbehance.ui.comments;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
-import com.example.clientforbehance.utils.ApiUtils;
+import com.example.domain.ApiUtils;
 import com.example.data.api.BehanceApi;
-import com.example.data.Storage;
 
 import javax.inject.Inject;
 
@@ -26,9 +25,9 @@ public class CommentsPresenter extends BasePresenter<CommentsView> {
 
     void getComments (int projectId) {
         mCompositeDisposable.add(mApi.getProjectComments(projectId)
-                .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse))
+                .doOnSuccess(commentResponse -> mStorage.insertCommentsToBaseFromResponse(commentResponse, projectId))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getCommentResponseFromStorage() : null)
+                        mStorage.getCommentResponseFromStorage(projectId) : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mCommentsView.showRefresh())

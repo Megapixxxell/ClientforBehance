@@ -1,4 +1,4 @@
-package com.example.domain.repository;
+package com.example.domain.service;
 
 import com.example.domain.model.project.Project;
 
@@ -6,10 +6,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 
-public interface ProjectRepository {
-
-    String SERVER = "SERVER";
-    String DB = "DB";
+public interface ProjectService {
 
     Single<List<Project>> getProjects();
     void insertProjects(List<Project> projects);

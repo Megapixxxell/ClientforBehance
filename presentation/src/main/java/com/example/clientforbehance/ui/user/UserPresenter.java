@@ -2,9 +2,8 @@ package com.example.clientforbehance.ui.user;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
-import com.example.clientforbehance.utils.ApiUtils;
+import com.example.domain.ApiUtils;
 import com.example.data.api.BehanceApi;
-import com.example.data.Storage;
 
 import javax.inject.Inject;
 
@@ -26,7 +25,7 @@ public class UserPresenter extends BasePresenter<UserView> {
     }
 
     void getUser(String username) {
-        mCompositeDisposable.add(mApi.getUserInfo(username)
+        mCompositeDisposable.add(mApi.getUser(username)
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(userResponse -> mStorage.insertUser(userResponse))
                 .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?

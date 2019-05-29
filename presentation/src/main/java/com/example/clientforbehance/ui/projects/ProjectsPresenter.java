@@ -2,9 +2,7 @@ package com.example.clientforbehance.ui.projects;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.example.clientforbehance.common.BasePresenter;
-import com.example.clientforbehance.utils.ApiUtils;
-import com.example.data.api.BehanceApi;
-import com.example.data.Storage;
+import com.example.domain.service.ProjectService;
 
 import javax.inject.Inject;
 
@@ -17,9 +15,7 @@ public class ProjectsPresenter extends BasePresenter<ProjectsView> {
     @Inject
     ProjectsView mView;
     @Inject
-    Storage mStorage;
-    @Inject
-    BehanceApi mApi;
+    ProjectService mProjectService;
 
     @Inject
     ProjectsPresenter() {
@@ -27,15 +23,12 @@ public class ProjectsPresenter extends BasePresenter<ProjectsView> {
 
     void getProjects(String query) {
 
-        mCompositeDisposable.add(mApi.getProjects(query)
-                .doOnSuccess(projectResponse -> mStorage.insertProjectsToBaseFromResponse(projectResponse))
-                .onErrorReturn(throwable -> ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ?
-                        mStorage.getProjectResponseFromStorage() : null)
+        mCompositeDisposable.add(mProjectService.getProjects()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mView.showRefresh())
                 .doFinally(() -> mView.hideRefresh())
-                .subscribe(response -> mView.showProjects(response.getProjects()),
+                .subscribe(response -> mView.showProjects(response),
                         throwable -> mView.showError()));
     }
 

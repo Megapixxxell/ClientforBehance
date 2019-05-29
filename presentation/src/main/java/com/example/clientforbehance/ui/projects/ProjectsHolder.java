@@ -30,15 +30,17 @@ class ProjectsHolder extends RecyclerView.ViewHolder {
     }
 
     void bind(Project project, ProjectsAdapter.OnItemClickListener onItemClickListener) {
-        Picasso.with(itemView.getContext())
-                .load(project.getCover().getPhotoUrl())
-                .fit()
-                .into(mCoverImage);
+        if (project.getCover() != null && project.getOwners().get(0).getImage() != null) {
+            Picasso.with(itemView.getContext())
+                    .load(project.getCover().getPhotoUrl())
+                    .fit()
+                    .into(mCoverImage);
 
-        Picasso.with(itemView.getContext())
-                .load(project.getOwners().get(0).getImage().getPhotoUrl())
-                .fit()
-                .into(mUserImage);
+            Picasso.with(itemView.getContext())
+                    .load(project.getOwners().get(0).getImage().getPhotoUrl())
+                    .fit()
+                    .into(mUserImage);
+        }
 
         String username = project.getOwners().get(0).getUsername();
         int projectId = project.getId();

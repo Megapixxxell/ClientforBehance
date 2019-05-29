@@ -68,6 +68,9 @@ public interface BehanceDao {
     @Query("select * from comment")
     List<Comment> getComments();
 
+    @Query("select * from comment where project_id = :projectId")
+    List<Comment> getCommentsProjectId(int projectId);
+
     @Query("select * from usercomment")
     List<UserComment> getUsers();
 
