@@ -53,7 +53,6 @@ public class ProjectFragment extends PresenterFragment
         return mProjectsPresenter;
     }
 
-
     public static ProjectFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -103,7 +102,7 @@ public class ProjectFragment extends PresenterFragment
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mProjectsAdapter);
 
-        onRefreshData();
+            onRefreshData();
     }
 
     @Override
