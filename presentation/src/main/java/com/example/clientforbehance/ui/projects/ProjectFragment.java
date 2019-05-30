@@ -16,20 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.dagger2.ProjectModule;
 import com.example.clientforbehance.ui.comments.CommentsActivity;
 import com.example.clientforbehance.ui.user.UserActivity;
 import com.example.domain.model.project.Project;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 public class ProjectFragment extends PresenterFragment
         implements ProjectsView, Refreshable, ProjectsAdapter.OnItemClickListener {
@@ -38,21 +34,14 @@ public class ProjectFragment extends PresenterFragment
     public static final String ARGS_KEY = "user args";
     public static final String PROJECT_ID = "project_id";
 
-    private String mQuery = "";
+    private String mQuery = "cat";
 
     private RecyclerView mRecyclerView;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private ProjectsAdapter mProjectsAdapter;
-    @Inject
     @InjectPresenter
     ProjectsPresenter mProjectsPresenter;
-
-    @ProvidePresenter
-    ProjectsPresenter providePresenter () {
-        return mProjectsPresenter;
-    }
-
 
     public static ProjectFragment newInstance() {
 
@@ -75,8 +64,7 @@ public class ProjectFragment extends PresenterFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        AppDelegate.getAppComponent().createProjectComponent(new ProjectModule(this)).inject(this);
+        AppDelegate.getAppComponent().injectProjectFragment(this);
     }
 
     @Nullable
@@ -103,7 +91,9 @@ public class ProjectFragment extends PresenterFragment
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mProjectsAdapter);
 
-        onRefreshData();
+        if (savedInstanceState == null) {
+            onRefreshData();
+        }
     }
 
     @Override

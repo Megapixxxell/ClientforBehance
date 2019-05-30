@@ -6,5 +6,4 @@ import com.example.domain.model.user.User;
 public interface UserView extends BaseView {
 
     void showUser(User user);
-
 }

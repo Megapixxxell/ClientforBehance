@@ -38,13 +38,4 @@ public class AppModule {
     BehanceDao provideBehanceDao(BehanceDatabase database) {
         return database.getBehanceDao();
     }
-
-    @Provides
-    @Singleton
-    Storage provideStorage(BehanceDao behanceDao) {
-        return new Storage(behanceDao);
-    }
-
-
-
 }

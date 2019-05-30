@@ -4,13 +4,8 @@ import com.example.domain.model.project.Project;
 
 import java.util.List;
 
-import io.reactivex.Single;
+public interface IProjectDBRepository {
 
-public interface ProjectRepository {
-
-    String SERVER = "SERVER";
-    String DB = "DB";
-
-    Single<List<Project>> getProjects();
+    List<Project> getProjects();
     void insertProjects(List<Project> projects);
 }

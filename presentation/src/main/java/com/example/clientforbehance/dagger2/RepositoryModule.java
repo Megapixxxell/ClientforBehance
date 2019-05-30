@@ -6,59 +6,54 @@ import com.example.data.repository.ProjectDBRepository;
 import com.example.data.repository.ProjectServerRepository;
 import com.example.data.repository.UserDBRepository;
 import com.example.data.repository.UserServerRepository;
-import com.example.domain.repository.CommentRepository;
-import com.example.domain.repository.ProjectRepository;
-import com.example.domain.repository.UserRepository;
+import com.example.domain.repository.ICommentDBRepository;
+import com.example.domain.repository.ICommentServerRepository;
+import com.example.domain.repository.IProjectDBRepository;
+import com.example.domain.repository.IProjectServerRepository;
+import com.example.domain.repository.IUserDBRepository;
+import com.example.domain.repository.IUserServerRepository;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class RepositoryModule {
+class RepositoryModule {
 
     @Provides
     @Singleton
-    @Named(ProjectRepository.SERVER)
-    ProjectRepository provideProjectServerRepository(ProjectServerRepository repository) {
+    IProjectServerRepository provideProjectServerRepository(ProjectServerRepository repository) {
         return repository;
     }
 
     @Provides
     @Singleton
-    @Named(ProjectRepository.DB)
-    ProjectRepository provideProjectDBRepository(ProjectDBRepository repository) {
+    IProjectDBRepository provideProjectDBRepository(ProjectDBRepository repository) {
         return repository;
     }
 
     @Provides
     @Singleton
-    @Named(UserRepository.SERVER)
-    UserRepository provideUserServerRepository() {
-        return new UserServerRepository();
+    IUserServerRepository provideUserServerRepository(UserServerRepository repository) {
+        return repository;
     }
 
     @Provides
     @Singleton
-    @Named(UserRepository.DB)
-    UserRepository provideUserDBRepository() {
-        return new UserDBRepository();
+    IUserDBRepository provideUserDBRepository(UserDBRepository repository) {
+        return repository;
     }
 
     @Provides
     @Singleton
-    @Named(CommentRepository.SERVER)
-    CommentRepository provideCommentServerRepository() {
-        return new CommentServerRepository();
+    ICommentServerRepository provideCommentServerRepository(CommentServerRepository repository) {
+        return repository;
     }
 
     @Provides
     @Singleton
-    @Named(CommentRepository.DB)
-    CommentRepository provideCommentDBRepository() {
-        return new CommentDBRepository();
+    ICommentDBRepository provideCommentDBRepository(CommentDBRepository repository) {
+        return repository;
     }
-
 }

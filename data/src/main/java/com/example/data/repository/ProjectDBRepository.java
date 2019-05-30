@@ -5,17 +5,14 @@ import com.example.domain.model.project.Cover;
 import com.example.domain.model.project.Owner;
 import com.example.domain.model.project.Project;
 import com.example.domain.model.project.Stats;
-import com.example.domain.repository.ProjectRepository;
+import com.example.domain.repository.IProjectDBRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
-
-public class ProjectDBRepository implements ProjectRepository {
+public class ProjectDBRepository implements IProjectDBRepository {
 
     private List<Cover> mCovers = new ArrayList<>();
     private List<Owner> mOwners = new ArrayList<>();
@@ -25,23 +22,17 @@ public class ProjectDBRepository implements ProjectRepository {
     BehanceDao mBehanceDao;
 
     @Inject
-    public ProjectDBRepository() {
+    ProjectDBRepository() {
     }
 
     @Override
-    public Single<List<Project>> getProjects() {
-
-        return Single.fromCallable(new Callable<List<Project>>() {
-            @Override
-            public List<Project> call() throws Exception {
-                List<Project> projects = mBehanceDao.getProjects();
-                for (Project project : projects) {
-                    project.setCover(mBehanceDao.getCoverFromProject(project.getId()));
-                    project.setOwners(mBehanceDao.getOwnersFromProject(project.getId()));
-                }
-                return projects;
-            }
-        });
+    public List<Project> getProjects() {
+        List<Project> projects = mBehanceDao.getProjects();
+        for (Project project : projects) {
+            project.setCover(mBehanceDao.getCoverFromProject(project.getId()));
+            project.setOwners(mBehanceDao.getOwnersFromProject(project.getId()));
+        }
+        return projects;
     }
 
     @Override
@@ -82,5 +73,4 @@ public class ProjectDBRepository implements ProjectRepository {
             mStats.add(stats);
         }
     }
-
 }

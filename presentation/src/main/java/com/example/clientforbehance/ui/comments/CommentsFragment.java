@@ -11,19 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.dagger2.CommentModule;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 import com.example.domain.model.comment.Comment;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 public class CommentsFragment extends PresenterFragment implements Refreshable, CommentsView {
 
@@ -31,15 +27,8 @@ public class CommentsFragment extends PresenterFragment implements Refreshable, 
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private CommentsAdapter mCommentsAdapter;
-    @Inject
     @InjectPresenter
     CommentsPresenter mCommentsPresenter;
-
-    @ProvidePresenter
-    CommentsPresenter provideCommentPresenter () {
-        return mCommentsPresenter;
-    }
-
     private int mProjectId;
 
     public static CommentsFragment newInstance(Bundle args) {
@@ -59,7 +48,7 @@ public class CommentsFragment extends PresenterFragment implements Refreshable, 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppDelegate.getAppComponent().createCommentComponent(new CommentModule(this)).inject(this);
+        AppDelegate.getAppComponent().injectCommentFragment(this);
     }
 
     @Nullable

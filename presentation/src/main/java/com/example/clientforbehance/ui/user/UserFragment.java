@@ -11,20 +11,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.R;
 import com.example.clientforbehance.common.PresenterFragment;
 import com.example.clientforbehance.common.RefreshOwner;
 import com.example.clientforbehance.common.Refreshable;
-import com.example.clientforbehance.dagger2.UserModule;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 import com.example.clientforbehance.utils.DateUtils;
 import com.example.domain.model.user.User;
 import com.squareup.picasso.Picasso;
-
-import javax.inject.Inject;
-
 
 public class UserFragment extends PresenterFragment implements Refreshable, UserView {
 
@@ -36,15 +31,8 @@ public class UserFragment extends PresenterFragment implements Refreshable, User
     private String mUsernameStr;
 
     private RefreshOwner mRefreshOwner;
-    @Inject
     @InjectPresenter
     UserPresenter mUserPresenter;
-
-    @ProvidePresenter
-    UserPresenter provideUserPresenter () {
-        return mUserPresenter;
-    }
-
 
     public static UserFragment newInstance(Bundle args) {
 
@@ -62,7 +50,7 @@ public class UserFragment extends PresenterFragment implements Refreshable, User
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppDelegate.getAppComponent().createUserComponent(new UserModule(this)).inject(this);
+        AppDelegate.getAppComponent().injectUserFragment(this);
     }
 
     @Nullable

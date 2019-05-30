@@ -6,11 +6,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 
-public interface CommentRepository {
-
-    String SERVER = "SERVER";
-    String DB = "DB";
+public interface ICommentServerRepository {
 
     Single<List<Comment>> getComments(int projectId);
-    void insertComments(List<Comment> comments, int projectId);
 }
