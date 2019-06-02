@@ -1,8 +1,5 @@
 package com.example.clientforbehance.ui.projects;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,9 +31,10 @@ public class ProjectFragment extends Fragment {
     public static final String ARGS_KEY = "user args";
     public static final String PROJECT_ID = "project_id";
 
-    protected String mQuerry = "Android";
+    private String mQuerry = "Android";
 
-    private ProjectsViewModel mProjectsViewModel;
+    @Inject
+    ProjectsViewModel mProjectsViewModel;
 
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener = new ProjectsAdapter.OnItemClickListener() {
         @Override
@@ -57,6 +55,7 @@ public class ProjectFragment extends Fragment {
             startActivity(commentsIntent);
         }
     };
+    private ProjectsBinding mBinding;
 
 
     public ProjectsAdapter.OnItemClickListener getOnItemClickListener() {
@@ -70,7 +69,6 @@ public class ProjectFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        mProjectsViewModel = new ProjectsViewModel(mOnItemClickListener);
     }
 
     @Override
@@ -82,9 +80,14 @@ public class ProjectFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
-        binding.setVm(mProjectsViewModel);
-        return binding.getRoot();
+        mBinding = ProjectsBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("query", mQuerry);
     }
 
     @Override
@@ -95,9 +98,14 @@ public class ProjectFragment extends Fragment {
         }
         Scope scope = AppDelegate.getAppScope();
         Toothpick.inject(this, scope);
-
-//        mProjectsViewModel = ViewModelProviders.of(this, factory).get(ProjectsViewModel.class);
-//        mProjectsViewModel.loadProjects(mQuerry);
+        mProjectsViewModel.setOnItemClickListener(mOnItemClickListener);
+        mBinding.setVm(mProjectsViewModel);
+        if (savedInstanceState == null) {
+            mProjectsViewModel.loadProjects(mQuerry);
+        } else {
+            mQuerry = savedInstanceState.getString("query");
+            mProjectsViewModel.loadProjects(mQuerry);
+        }
     }
 
     @Override
@@ -135,7 +143,6 @@ public class ProjectFragment extends Fragment {
 
         super.onCreateOptionsMenu(menu, inflater);
     }
-
 
 
 }

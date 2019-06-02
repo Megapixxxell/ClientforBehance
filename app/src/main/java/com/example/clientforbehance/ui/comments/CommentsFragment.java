@@ -14,13 +14,16 @@ import com.example.clientforbehance.R;
 import com.example.clientforbehance.databinding.CommentsBindingg;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
 
+import javax.inject.Inject;
+
 import toothpick.Toothpick;
 
 public class CommentsFragment extends Fragment {
 
     private int mProjectId;
-
-    private CommentsViewModel mCommentsViewModel;
+    @Inject
+    CommentsViewModel mCommentsViewModel;
+    private CommentsBindingg mCommentsBindingg;
 
     public static CommentsFragment newInstance(Bundle args) {
         CommentsFragment fragment = new CommentsFragment();
@@ -32,15 +35,13 @@ public class CommentsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mCommentsViewModel = new CommentsViewModel();
-
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        CommentsBindingg commentsBindingg = CommentsBindingg.inflate(inflater, container, false);
-        commentsBindingg.setViewModel(mCommentsViewModel);
-        return commentsBindingg.getRoot();
+        mCommentsBindingg = CommentsBindingg.inflate(inflater, container, false);
+        return mCommentsBindingg.getRoot();
     }
 
     @Override
@@ -52,9 +53,9 @@ public class CommentsFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(R.string.comments);
         }
-        mCommentsViewModel.loadComments(mProjectId);
         Toothpick.inject(this, AppDelegate.getAppScope());
-
+        mCommentsBindingg.setViewModel(mCommentsViewModel);
+        mCommentsViewModel.loadComments(mProjectId);
 
     }
 
@@ -63,5 +64,4 @@ public class CommentsFragment extends Fragment {
         mCommentsViewModel.dispatchDetach();
         super.onDetach();
     }
-
 }

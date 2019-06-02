@@ -10,15 +10,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.clientforbehance.AppDelegate;
-import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.databinding.UserBinding;
 import com.example.clientforbehance.ui.projects.ProjectFragment;
+
+import javax.inject.Inject;
 
 import toothpick.Toothpick;
 
 public class UserFragment extends Fragment {
 
-    private UserViewModel mUserViewModel;
+    @Inject
+    UserViewModel mUserViewModel;
+    private UserBinding mUserBinding;
 
     public static UserFragment newInstance(Bundle args) {
         UserFragment fragment = new UserFragment();
@@ -29,15 +32,13 @@ public class UserFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mUserViewModel = new UserViewModel();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        UserBinding userBinding = UserBinding.inflate(inflater, container, false);
-        userBinding.setVm(mUserViewModel);
-        return userBinding.getRoot();
+        mUserBinding = UserBinding.inflate(inflater, container, false);
+        return mUserBinding.getRoot();
     }
 
     @Override
@@ -53,7 +54,7 @@ public class UserFragment extends Fragment {
         }
 
         Toothpick.inject(this, AppDelegate.getAppScope());
-
+        mUserBinding.setVm(mUserViewModel);
         mUserViewModel.loadUser(usernameStr);
     }
 

@@ -5,7 +5,6 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.support.v4.widget.SwipeRefreshLayout;
 
-import com.example.clientforbehance.AppDelegate;
 import com.example.clientforbehance.data.api.BehanceApi;
 import com.example.clientforbehance.data.model.Storage;
 import com.example.clientforbehance.data.model.project.Project;
@@ -16,7 +15,6 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import toothpick.Toothpick;
 
 public class ProjectsViewModel extends ViewModel {
 
@@ -38,10 +36,9 @@ public class ProjectsViewModel extends ViewModel {
         }
     };
 
-    ProjectsViewModel(ProjectsAdapter.OnItemClickListener onItemClickListener) {
-        mOnItemClickListener = onItemClickListener;
+    @Inject
+    ProjectsViewModel() {
     }
-
 
     void loadProjects(String querry) {
         mDisposable = mApi.getProjects(querry)
@@ -64,6 +61,10 @@ public class ProjectsViewModel extends ViewModel {
     void dispatchDetach() {
         mStorage = null;
         if (mDisposable != null) mDisposable.dispose();
+    }
+
+    public void setOnItemClickListener(ProjectsAdapter.OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     public ProjectsAdapter.OnItemClickListener getOnItemClickListener() {

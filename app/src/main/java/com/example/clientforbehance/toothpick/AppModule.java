@@ -16,15 +16,11 @@ public class AppModule extends Module {
         mApp = app;
         bind(AppDelegate.class).toInstance(mApp);
         bind(Storage.class).toInstance(provideStorage());
-
     }
 
-
-
-    Storage provideStorage () {
+    private Storage provideStorage() {
         final BehanceDatabase behanceDatabase = Room.databaseBuilder(mApp, BehanceDatabase.class,
                 "behance database").fallbackToDestructiveMigration().build();
-
         return new Storage(behanceDatabase.getBehanceDao());
     }
 

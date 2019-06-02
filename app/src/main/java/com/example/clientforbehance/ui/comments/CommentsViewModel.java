@@ -34,6 +34,7 @@ public class CommentsViewModel {
         }
     };
 
+    @Inject
     CommentsViewModel() {
     }
 

@@ -40,6 +40,7 @@ public class UserViewModel {
         }
     };
 
+    @Inject
     UserViewModel() {
     }
 
