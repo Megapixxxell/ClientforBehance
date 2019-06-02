@@ -22,3 +22,5 @@
 Ветка Dagger2 | MVP + Dagger2.
 
 Ветка CleanArchitecture | MVP(Moxy) + Dagger2 + Clean Architecture (Presenter, Data, Domain)
+
+Ветка Toothpick | MVVM + Toothpick
